@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Login — College Timetable Generator{% endblock %}
+
+{% block content_no_sidebar %}
+<div class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="bi bi-calendar2-week-fill login-icon"></i>
+                <h1>College Timetable</h1>
+                <p>Generator System</p>
+            </div>
+            <form method="POST" action="{{ url_for('login') }}">
+                <div class="mb-3">
+                    <label for="username" class="form-label">
+                        <i class="bi bi-person"></i> Username
+                    </label>
+                    <input type="text" class="form-control" id="username" name="username"
+                        placeholder="Enter your username" required autofocus>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">
+                        <i class="bi bi-lock"></i> Password
+                    </label>
+                    <input type="password" class="form-control" id="password" name="password"
+                        placeholder="Enter your password" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 login-btn">
+                    <i class="bi bi-box-arrow-in-right"></i> Sign In
+                </button>
+            </form>
+            <div class="login-footer">
+                <small>Default: admin / admin123</small>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

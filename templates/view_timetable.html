@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+{% block title %}View Timetable — College Timetable Generator{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-table"></i> View Timetable</h2>
+    <p class="text-muted">Filter and view generated schedules</p>
+</div>
+
+<!-- Filter Bar -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" action="{{ url_for('view_timetable') }}" class="row g-3 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label">View By</label>
+                <select class="form-select" name="view" id="viewType" onchange="toggleFilters()">
+                    <option value="class" {{ 'selected' if view_type=='class' }}>By Class</option>
+                    <option value="teacher" {{ 'selected' if view_type=='teacher' }}>By Teacher</option>
+                    <option value="room" {{ 'selected' if view_type=='room' }}>By Room</option>
+                    <option value="day" {{ 'selected' if view_type=='day' }}>By Day</option>
+                </select>
+            </div>
+            <div class="col-md-4 filter-group" id="classFilter">
+                <label class="form-label">Select Class</label>
+                <select class="form-select" name="id" id="classSelect">
+                    <option value="">-- Choose --</option>
+                    {% for cls in classes %}
+                    <option value="{{ cls.id }}" {{ 'selected' if view_id==cls.id and view_type=='class' }}>
+                        {{ cls.department }} Sem-{{ cls.semester }} Sec-{{ cls.section }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 filter-group" id="teacherFilter" style="display:none;">
+                <label class="form-label">Select Teacher</label>
+                <select class="form-select" name="id" id="teacherSelect" disabled>
+                    <option value="">-- Choose --</option>
+                    {% for t in teachers %}
+                    <option value="{{ t.id }}" {{ 'selected' if view_id==t.id and view_type=='teacher' }}>
+                        {{ t.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 filter-group" id="roomFilter" style="display:none;">
+                <label class="form-label">Select Room</label>
+                <select class="form-select" name="id" id="roomSelect" disabled>
+                    <option value="">-- Choose --</option>
+                    {% for r in rooms %}
+                    <option value="{{ r.id }}" {{ 'selected' if view_id==r.id and view_type=='room' }}>
+                        {{ r.room_number }} ({{ r.room_type }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4 filter-group" id="dayFilter" style="display:none;">
+                <label class="form-label">Select Day</label>
+                <select class="form-select" name="day" id="daySelect" disabled>
+                    <option value="">-- Choose --</option>
+                    {% for d in days %}
+                    <option value="{{ d }}" {{ 'selected' if view_day==d }}>{{ d }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> View
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Timetable Display -->
+{% if timetable_data %}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0"><i class="bi bi-calendar-week"></i> {{ title }}</h5>
+        <div class="btn-group">
+            <a href="{{ url_for('export_timetable', fmt='pdf', view=view_type, id=view_id, day=view_day) }}"
+                class="btn btn-sm btn-outline-danger">
+                <i class="bi bi-file-earmark-pdf"></i> PDF
+            </a>
+            <a href="{{ url_for('export_timetable', fmt='excel', view=view_type, id=view_id, day=view_day) }}"
+                class="btn btn-sm btn-outline-success">
+                <i class="bi bi-file-earmark-excel"></i> Excel
+            </a>
+            <a href="{{ url_for('export_timetable', fmt='image', view=view_type, id=view_id, day=view_day) }}"
+                class="btn btn-sm btn-outline-primary">
+                <i class="bi bi-file-earmark-image"></i> Image
+            </a>
+        </div>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-bordered timetable-grid">
+            <thead>
+                <tr class="table-primary">
+                    <th class="text-center">Day / Period</th>
+                    {% for p in sorted_periods %}
+                    <th class="text-center">Period {{ p }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for day in sorted_days %}
+                <tr>
+                    <td class="fw-bold text-center day-cell">{{ day }}</td>
+                    {% for p in sorted_periods %}
+                    <td class="timetable-cell">
+                        {% set entries = grid.get((day, p), []) %}
+                        {% if entries %}
+                        {% for entry in entries %}
+                        <div class="tt-entry {{ 'tt-lab' if entry.subject_type == 'lab' else 'tt-theory' }}">
+                            <div class="tt-subject">{{ entry.subject_name }}</div>
+                            <div class="tt-teacher"><i class="bi bi-person"></i> {{ entry.teacher_name }}</div>
+                            <div class="tt-room"><i class="bi bi-door-open"></i> {{ entry.room_number }}</div>
+                            {% if view_type != 'class' %}
+                            <div class="tt-class"><i class="bi bi-people"></i> {{ entry.department }} {{ entry.semester
+                                }}{{ entry.section }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                        {% else %}
+                        <div class="tt-empty">—</div>
+                        {% endif %}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% elif view_id or view_day %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-calendar-x" style="font-size: 3rem; color: #ccc;"></i>
+        <h5 class="mt-3 text-muted">No Timetable Data</h5>
+        <p class="text-muted">Generate a timetable first from the <a href="{{ url_for('generate') }}">Generate page</a>.
+        </p>
+    </div>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-funnel" style="font-size: 3rem; color: #ccc;"></i>
+        <h5 class="mt-3 text-muted">Select a Filter</h5>
+        <p class="text-muted">Choose a class, teacher, room, or day above and click "View" to see the timetable.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleFilters() {
+        const viewType = document.getElementById('viewType').value;
+        const filters = {
+            'class': 'classFilter',
+            'teacher': 'teacherFilter',
+            'room': 'roomFilter',
+            'day': 'dayFilter'
+        };
+
+        // Hide all filter groups and disable their selects
+        Object.values(filters).forEach(id => {
+            const el = document.getElementById(id);
+            el.style.display = 'none';
+            const select = el.querySelector('select');
+            if (select) select.disabled = true;
+        });
+
+        // Show the active filter and enable its select
+        const activeFilter = document.getElementById(filters[viewType]);
+        activeFilter.style.display = 'block';
+        const activeSelect = activeFilter.querySelector('select');
+        if (activeSelect) activeSelect.disabled = false;
+    }
+
+    // Run on page load
+    document.addEventListener('DOMContentLoaded', toggleFilters);
+</script>
+{% endblock %}

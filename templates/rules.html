@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Rules — College Timetable Generator{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-gear"></i> Scheduling Rules</h2>
+    <p class="text-muted">Configure global timetable generation settings</p>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('rules') }}">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="bi bi-calendar-week"></i> Working Days per Week</label>
+                            <input type="number" class="form-control" name="working_days"
+                                value="{{ rules.working_days if rules else 5 }}" min="1" max="7">
+                            <div class="form-text">Number of days classes are held (e.g., 5 for Mon–Fri)</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="bi bi-clock"></i> Periods per Day</label>
+                            <input type="number" class="form-control" name="periods_per_day"
+                                value="{{ rules.periods_per_day if rules else 6 }}" min="1" max="10">
+                            <div class="form-text">Maximum number of periods each day</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="bi bi-cup-hot"></i> Break After Period</label>
+                            <input type="number" class="form-control" name="break_after"
+                                value="{{ rules.break_after if rules else 3 }}" min="1" max="10">
+                            <div class="form-text">Insert a break after this period number</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="bi bi-hourglass-split"></i> Break Duration (min)</label>
+                            <input type="number" class="form-control" name="break_duration"
+                                value="{{ rules.break_duration if rules else 15 }}" min="5" max="60">
+                            <div class="form-text">Duration of break in minutes</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="bi bi-cpu"></i> Lab Periods (consecutive)</label>
+                            <input type="number" class="form-control" name="lab_periods"
+                                value="{{ rules.lab_periods if rules else 2 }}" min="1" max="4">
+                            <div class="form-text">Number of consecutive periods for lab subjects</div>
+                        </div>
+                    </div>
+                    <hr>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-lg"></i> Save Rules
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-info-circle text-info"></i> How Rules Work</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2">
+                        <strong>Working Days:</strong> Defines Mon–Fri or Mon–Sat schedule.
+                    </li>
+                    <li class="mb-2">
+                        <strong>Periods/Day:</strong> Sets how many teaching slots per day.
+                    </li>
+                    <li class="mb-2">
+                        <strong>Break After:</strong> Inserts a break in the middle of the day.
+                    </li>
+                    <li class="mb-2">
+                        <strong>Lab Periods:</strong> Lab subjects get this many consecutive periods.
+                    </li>
+                </ul>
+                <div class="alert alert-info">
+                    <i class="bi bi-lightbulb"></i> These rules are used by the timetable generation engine when
+                    creating schedules.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

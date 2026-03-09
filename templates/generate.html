@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}Generate Timetable — College Timetable Generator{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-lightning-charge"></i> Generate Timetable</h2>
+    <p class="text-muted">Automatically create optimized schedules</p>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                {% if result is none %}
+                <i class="bi bi-lightning-charge" style="font-size: 4rem; color: var(--primary-color);"></i>
+                <h4 class="mt-3">Ready to Generate</h4>
+                <p class="text-muted mb-4">
+                    The system will automatically assign subjects to time slots while avoiding
+                    teacher clashes, room clashes, and respecting weekly hours.
+                </p>
+                <form method="POST" action="{{ url_for('generate') }}">
+                    <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+                        <i class="bi bi-lightning-charge"></i> Generate Timetable
+                    </button>
+                </form>
+                <div class="mt-3">
+                    <small class="text-muted">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        This will clear the existing timetable and create a new one.
+                    </small>
+                </div>
+                {% else %}
+                <!-- Results -->
+                <div class="text-start">
+                    <h4>
+                        <i class="bi bi-check-circle text-success"></i> Generation Complete
+                    </h4>
+
+                    <div class="row g-3 my-3">
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 text-center">
+                                <h3 class="text-success mb-0">{{ result.assigned }}</h3>
+                                <small class="text-muted">Slots Assigned</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 text-center">
+                                <h3 class="text-warning mb-0">{{ result.skipped }}</h3>
+                                <small class="text-muted">Skipped</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="border rounded p-3 text-center">
+                                <h3 class="text-danger mb-0">{{ result.clashes|length }}</h3>
+                                <small class="text-muted">Issues</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if result.clashes %}
+                    <div class="alert alert-warning">
+                        <h6><i class="bi bi-exclamation-triangle"></i> Issues Found:</h6>
+                        <ul class="mb-0">
+                            {% for clash in result.clashes %}
+                            <li>{{ clash }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    {% if result.details %}
+                    <div class="mt-3">
+                        <h6><i class="bi bi-list-check"></i> Assignment Details:</h6>
+                        <div class="assignment-log" style="max-height: 300px; overflow-y: auto;">
+                            <ul class="list-unstyled">
+                                {% for detail in result.details %}
+                                <li class="mb-1"><small>{{ detail }}</small></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="mt-4 d-flex gap-2">
+                        <form method="POST" action="{{ url_for('generate') }}" class="d-inline">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="bi bi-arrow-clockwise"></i> Regenerate
+                            </button>
+                        </form>
+                        <a href="{{ url_for('view_timetable') }}" class="btn btn-primary">
+                            <i class="bi bi-table"></i> View Timetable
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-shield-check text-success"></i> Clash Prevention</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">
+                        <i class="bi bi-person-badge text-primary"></i>
+                        <strong>Teacher Clash:</strong>
+                        No teacher is assigned to two classes at the same time.
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-door-open text-success"></i>
+                        <strong>Room Clash:</strong>
+                        No room is double-booked.
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-book text-warning"></i>
+                        <strong>Subject Hours:</strong>
+                        Each subject gets its required weekly hours.
+                    </li>
+                    <li class="list-group-item">
+                        <i class="bi bi-cpu text-info"></i>
+                        <strong>Lab Sessions:</strong>
+                        Lab subjects get consecutive periods.
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-arrow-clockwise text-warning"></i> Regeneration</h5>
+                <p class="card-text small text-muted">
+                    Use "Regenerate" when data changes (teachers, rooms, subjects).
+                    The system clears the old timetable and creates a fresh one.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — College Timetable Generator{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+    <p class="text-muted">Overview of your timetable system</p>
+</div>
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-4 col-lg">
+        <div class="stat-card stat-teachers">
+            <div class="stat-icon"><i class="bi bi-person-badge"></i></div>
+            <div class="stat-info">
+                <h3>{{ stats.teachers }}</h3>
+                <span>Teachers</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg">
+        <div class="stat-card stat-subjects">
+            <div class="stat-icon"><i class="bi bi-book"></i></div>
+            <div class="stat-info">
+                <h3>{{ stats.subjects }}</h3>
+                <span>Subjects</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg">
+        <div class="stat-card stat-classes">
+            <div class="stat-icon"><i class="bi bi-people"></i></div>
+            <div class="stat-info">
+                <h3>{{ stats.classes }}</h3>
+                <span>Classes</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg">
+        <div class="stat-card stat-rooms">
+            <div class="stat-icon"><i class="bi bi-door-open"></i></div>
+            <div class="stat-info">
+                <h3>{{ stats.rooms }}</h3>
+                <span>Rooms</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg">
+        <div class="stat-card stat-entries">
+            <div class="stat-icon"><i class="bi bi-table"></i></div>
+            <div class="stat-info">
+                <h3>{{ stats.timetable_entries }}</h3>
+                <span>Schedule Entries</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="card action-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-lightning-charge text-warning"></i> Quick Actions</h5>
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('generate') }}" class="btn btn-primary">
+                        <i class="bi bi-lightning-charge"></i> Generate Timetable
+                    </a>
+                    <a href="{{ url_for('view_timetable') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-table"></i> View Timetable
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card action-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-database text-info"></i> Manage Data</h5>
+                <div class="d-grid gap-2">
+                    <div class="btn-group">
+                        <a href="{{ url_for('teachers') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-person-badge"></i> Teachers
+                        </a>
+                        <a href="{{ url_for('subjects') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-book"></i> Subjects
+                        </a>
+                        <a href="{{ url_for('classes') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-people"></i> Classes
+                        </a>
+                    </div>
+                    <div class="btn-group">
+                        <a href="{{ url_for('rooms') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-door-open"></i> Rooms
+                        </a>
+                        <a href="{{ url_for('timeslots') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-clock"></i> Time Slots
+                        </a>
+                        <a href="{{ url_for('rules') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-gear"></i> Rules
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
